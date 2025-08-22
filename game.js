@@ -19,15 +19,14 @@ createApp({
     winner: null
   }),
   mounted() {
-    // 使用公共中继
-    this.peer = new Peer({ host: "peerjs.mmediagroup.fr", port: 443, secure: true });
+    // 使用官方公共中继（GitHub Pages 也能用）
+    this.peer = new Peer({ host: "0.peerjs.com", port: 443, secure: true });
     this.peer.on("open", id => this.myId = id);
     this.peer.on("connection", c => this.setupConn(c));
   },
   methods: {
     createRoom() {
       this.myTurn = true;
-      // 等待对方连接
     },
     joinRoom() {
       if (!this.roomToJoin) return;
@@ -61,7 +60,6 @@ createApp({
       this.word = "";
       this.myTurn = false;
       this.conn.send(JSON.stringify({ type: "word", word: w }));
-      // 检查对方还能不能接
       const next = w.slice(-1);
       const remain = [...DICT].filter(d => d.startsWith(next) && !this.history.includes(d));
       if (remain.length === 0) {
