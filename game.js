@@ -16,27 +16,38 @@ createApp({
     word: "",
     myTurn: false,
     peerCnt: 1,
-    winner: null
+    winner: null,
+    status: "正在连接服务器..."
   }),
   mounted() {
-    // 使用官方公共中继（GitHub Pages 也能用）
-    this.peer = new Peer({ host: "0.peerjs.com", port: 443, secure: true });
-    this.peer.on("open", id => this.myId = id);
+    // 公共中继 1
+    this.peer = new Peer({ host: "peerjs.mmediagroup.fr", port: 443, secure: true });
+    this.peer.on("open", id => {
+      this.myId = id;
+      this.status = "已连接，可创建或加入房间";
+    });
     this.peer.on("connection", c => this.setupConn(c));
+    this.peer.on("error", e => {
+      this.status = "连接失败，请换 4G/5G 或刷新重试";
+      console.error(e);
+    });
   },
   methods: {
     createRoom() {
       this.myTurn = true;
+      this.status = "房间已创建，把上面 ID 发给对方";
     },
     joinRoom() {
       if (!this.roomToJoin) return;
       this.conn = this.peer.connect(this.roomToJoin.trim());
       this.setupConn(this.conn);
+      this.status = "正在加入...";
     },
     setupConn(c) {
       this.conn = c;
       this.conn.on("open", () => {
         this.peerCnt = 2;
+        this.status = "对方已连接！";
         this.conn.on("data", msg => {
           msg = JSON.parse(msg);
           if (msg.type === "word") {
