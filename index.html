@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"/>
+<title>单词接龙（公网版）</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"/>
+<link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+<div id="app">
+  <h1>单词接龙</h1>
+
+  <!-- 连接区 -->
+  <div v-if="!conn">
+    <button @click="createRoom">创建房间</button>
+    <input v-model="roomToJoin" placeholder="输入房间号加入"/>
+    <button @click="joinRoom">加入</button>
+  </div>
+
+  <!-- 游戏区 -->
+  <div v-else>
+    <p>房间号：<strong>{{myId}}</strong></p>
+    <p>在线：{{peerCnt}}/2</p>
+
+    <div id="history">
+      <div v-for="w in history" :key="w">{{w}}</div>
+    </div>
+
+    <form @submit.prevent="submitWord">
+      <input v-model="word" placeholder="输入单词" :disabled="!myTurn"/>
+      <button type="submit" :disabled="!myTurn">发送</button>
+    </form>
+
+    <p v-if="winner!==null">
+      {{winner===myId?"你赢了！":"你输了…"}}
+    </p>
+  </div>
+</div>
+
+<!-- 外部库 -->
+<script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
+<script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+<script src="game.js"></script>
+</body>
+</html>
